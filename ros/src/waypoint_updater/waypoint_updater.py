@@ -55,7 +55,7 @@ class WaypointUpdater(object):
         self.current_position.append(msg.pose.position.z)
 
         self.final_wps = self.get_forward_waypoints()
-        rospy.loginfo('current, final positions = %s, %s', str(self.current_position), str(self.final_wps[0].pose.pose.position))
+        #rospy.loginfo('current, final positions = %s, %s', str(self.current_position), str(self.final_wps[0].pose.pose.position))
         
         self.final_lane.header.frame_id = '/world'
         self.final_lane.header.stamp = rospy.Time.now()
@@ -67,7 +67,7 @@ class WaypointUpdater(object):
     def waypoints_cb(self, waypoints):
         # TODO: Implement
         #rospy.loginfo("total base_waypoints = %s", len(waypoints.waypoints))
-        rospy.loginfo("inside base cb")
+        #rospy.loginfo("inside base cb")
         self.base_wps = []
         for i in range(len(waypoints.waypoints)):
             base_wp  = []
@@ -141,7 +141,7 @@ class WaypointUpdater(object):
         
         #rospy.loginfo("ref_yaw, car_ref_yaw = %s, %s", str(ref_yaw), str(car_ref_yaw))
         final_wps = []
-        j = self.prev_closest_idx
+        j = self.prev_closest_idx + 20
         
         for i in range(LOOKAHEAD_WPS):
             #final_wps.append(self.base_wps[j])
@@ -151,6 +151,7 @@ class WaypointUpdater(object):
             wp.pose.pose.position.x = self.base_wps[j][0]
             wp.pose.pose.position.y = self.base_wps[j][1]
             wp.pose.pose.position.z = self.base_wps[j][2]
+            wp.twist.twist.linear.x = 10
             final_wps.append(wp)
             if j > len(self.base_wps):
                 j = 0
