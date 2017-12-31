@@ -69,6 +69,7 @@ class WaypointLoader(object):
             if vel < 1.:
                 vel = 0.
             wp.twist.twist.linear.x = min(vel, wp.twist.twist.linear.x)
+            #rospy.loginfo("inside wp loader, x, vel = %s, %s", wp.pose.pose.position.x, wp.twist.twist.linear.x)
         return waypoints
 
     def publish(self, waypoints):
