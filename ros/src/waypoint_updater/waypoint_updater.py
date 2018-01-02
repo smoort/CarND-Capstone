@@ -220,9 +220,9 @@ class WaypointUpdater(object):
         end_velocity = self.base_wps[end_wp][3]
 
         if self.traffic_light_state != -1:
-            rospy.loginfo("red light spotted at wp = %s", self.traffic_light_state)
+            #rospy.loginfo("red light spotted at wp = %s", self.traffic_light_state)
             if self.traffic_light_state <= end_wp:
-                rospy.loginfo("nearing red light at wp = %s", self.traffic_light_state)
+                rospy.loginfo("red light close at wp = %s", self.traffic_light_state)
                 end_wp = self.traffic_light_state
                 end_velocity = 0
         
@@ -231,7 +231,7 @@ class WaypointUpdater(object):
             num_of_way_points = num_of_way_points + self.base_wps_count
         
         velocity_delta = (end_velocity - start_velocity) / num_of_way_points
-        rospy.loginfo("velocity_delta, start_velocity, end_velocity = %s, %s, %s", velocity_delta, start_velocity, end_velocity)
+        rospy.loginfo("start_wp, end_wp, start_velocity, end_velocity = %s, %s, %s, %s", start_wp, end_wp, start_velocity, end_velocity)
         if 0 < velocity_delta < 1.0:
             velocity_delta = 1.0
         if -1 < velocity_delta < 0:
@@ -263,7 +263,7 @@ class WaypointUpdater(object):
 
         forward_wps[-1].twist.twist.linear.x = end_velocity
         self.final_wps = forward_wps
-        rospy.loginfo("no_of_wp, velocity_delta, start_velocity, end_velocity = %s, %s, %s, %s", len(self.final_wps), velocity_delta, forward_wps[0].twist.twist.linear.x, forward_wps[-1].twist.twist.linear.x)
+        #rospy.loginfo("no_of_wp, velocity_delta, start_velocity, end_velocity = %s, %s, %s, %s", len(self.final_wps), velocity_delta, forward_wps[0].twist.twist.linear.x, forward_wps[-1].twist.twist.linear.x)
         return
 
     def traffic_cb(self, traffic_light_state):

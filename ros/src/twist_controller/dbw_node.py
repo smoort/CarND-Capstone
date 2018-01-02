@@ -51,7 +51,8 @@ class DBWNode(object):
       
         self.twist_cmd = TwistStamped()
         self.current_velocity = TwistStamped()
-        self.dbw_enabled = Bool()
+        self.dbw_enabled = False
+        self.velocity_cte = 0
 
         self.steer_pub = rospy.Publisher('/vehicle/steering_cmd',
                                          SteeringCmd, queue_size=1)
@@ -95,7 +96,9 @@ class DBWNode(object):
             #                                                     <any other argument you need>)
             # if <dbw is enabled>:
             #   self.publish(throttle, brake, steer)
-            throttle, brake, steering = self.controller.control(self.twist_cmd, self.current_velocity)
+            if not self.dbw_enabled:
+                self.velocity_cte = 0
+            throttle, brake, self.velocity_cte, steering = self.controller.control(self.twist_cmd, self.current_velocity, self.velocity_cte)
             if self.dbw_enabled:
                 self.publish(throttle, brake, steering)
             rate.sleep()
