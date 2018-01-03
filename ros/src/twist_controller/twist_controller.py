@@ -21,14 +21,14 @@ class Controller(object):
         #velocity_diff = twist_cmd.twist.linear.x
         #rospy.loginfo("twist_controller current velocity, end_velocity, diff = %s, %s, %s", current_velocity.twist.linear.x, twist_cmd.twist.linear.x, velocity_diff)
         if velocity_diff > 0:
-            throttle = (velocity_diff * 0.15 * ACCEL_LIMIT) - 0.02
+            throttle = (velocity_diff * 0.5 * ACCEL_LIMIT) - 0.02
             if throttle > 1:
                 throttle = 1
             #throttle = (velocity_diff / 11.11 * ACCEL_LIMIT)
             brake = 0.0
         elif velocity_diff < 0:
             throttle = 0.0 - 0.02
-            brake = velocity_diff * 10.0 * BRAKE_LIMIT
+            brake = velocity_diff * 0.1 * BRAKE_LIMIT
         else:
             throttle = 0.0
             brake = 0.0
@@ -38,7 +38,7 @@ class Controller(object):
             
         yaw_controller = YawController()
         steering = yaw_controller.get_steering(twist_cmd.twist.linear.x, twist_cmd.twist.angular.z, current_velocity.twist.linear.x)
-        #rospy.loginfo("twist_controller current velocity, end_velocity, throttle = %s, %s, %s, %s, %s", current_velocity.twist.linear.x, twist_cmd.twist.linear.x,throttle, brake, steering)
+        rospy.loginfo("twist_controller current velocity, end_velocity, throttle = %s, %s, %s, %s, %s", current_velocity.twist.linear.x, twist_cmd.twist.linear.x,throttle, brake, steering)
         #rospy.loginfo("throttle, brake, steering = %s, %s, %s", throttle, brake, steering)
         return throttle, brake, velocity_cte, steering
         #return 0.0, 0.5, 0, 0

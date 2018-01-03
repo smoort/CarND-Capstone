@@ -24,9 +24,9 @@ as well as to verify your TL classifier.
 TODO (for Yousuf and Aaron): Stopline location for each traffic light.
 '''
 
-LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. You can change this number
+LOOKAHEAD_WPS = 100 # Number of waypoints we will publish. You can change this number
 WHEEL_BASE = rospy.get_param('~wheel_base', 2.8498)
-LATENCY = 0.500     # 500ms latency assumed
+LATENCY = 0.200     # 200ms latency assumed
 
 class WaypointUpdater(object):
 
@@ -226,22 +226,66 @@ class WaypointUpdater(object):
                 end_wp = self.traffic_light_state
                 end_velocity = 0
         
-        num_of_way_points = end_wp - start_wp
+        num_of_way_points = end_wp - start_wp + 1
         if num_of_way_points < 0:
             num_of_way_points = num_of_way_points + self.base_wps_count
         
         velocity_delta = (end_velocity - start_velocity) / num_of_way_points
         rospy.loginfo("start_wp, end_wp, start_velocity, end_velocity = %s, %s, %s, %s", start_wp, end_wp, start_velocity, end_velocity)
-        if 0 < velocity_delta < 1.0:
-            velocity_delta = 1.0
-        if -1 < velocity_delta < 0:
-            velocity_delta = -1.0
+        velocity_sensitivity = 0.5
+        if 0 < velocity_delta < velocity_sensitivity:
+            velocity_delta = velocity_sensitivity
+        if -velocity_sensitivity < velocity_delta < 0:
+            velocity_delta = -velocity_sensitivity
+        
+        
+        forward_wps = []
+        forward_velocities = []
+        
+        if velocity_delta > 0:
+            rospy.loginfo("inside accel mode")
+            v = start_velocity
+            for i in range(num_of_way_points):
+                v = v + velocity_delta
+                if v > end_velocity:
+                    v = end_velocity
+                forward_velocities.append(v)
+        elif velocity_delta < 0:
+            rospy.loginfo("inside brake mode")
+            v = end_velocity
+            for i in range(num_of_way_points):
+                forward_velocities.append(v)
+                v = v - velocity_delta
+                if v > start_velocity:
+                    v = start_velocity
+            forward_velocities.reverse()
+            rospy.loginfo("velocities = %s", str(forward_velocities))
+        else:
+            for i in range(num_of_way_points):
+                forward_velocities.append(0)
+        
+        
+        j = start_wp
+        for i in range(num_of_way_points):
+            wp = Waypoint()
+            wp.pose.header.frame_id = '/world'
+            wp.pose.header.stamp = rospy.Time.now()
+            
+            wp.pose.pose.position.x = self.base_wps[j][0]
+            wp.pose.pose.position.y = self.base_wps[j][1]
+            wp.pose.pose.position.z = self.base_wps[j][2]
+            wp.twist.twist.linear.x = forward_velocities[i]
+
+            forward_wps.append(wp)
+            j = j + 1
+            if j > len(self.base_wps):
+                j = 0
+        """
         
         forward_wps = []
         v = start_velocity
         j = start_wp
-        
-        for i in range(LOOKAHEAD_WPS):
+        for i in range(num_of_way_points):
             #final_wps.append(self.base_wps[j])
             wp = Waypoint()
             wp.pose.header.frame_id = '/world'
@@ -260,10 +304,10 @@ class WaypointUpdater(object):
             forward_wps.append(wp)
             if j > len(self.base_wps):
                 j = 0
+        """
 
-        forward_wps[-1].twist.twist.linear.x = end_velocity
         self.final_wps = forward_wps
-        #rospy.loginfo("no_of_wp, velocity_delta, start_velocity, end_velocity = %s, %s, %s, %s", len(self.final_wps), velocity_delta, forward_wps[0].twist.twist.linear.x, forward_wps[-1].twist.twist.linear.x)
+        rospy.loginfo("no_of_wp, velocity_delta, start_velocity, end_velocity = %s, %s, %s, %s", len(self.final_wps), velocity_delta, forward_wps[0].twist.twist.linear.x, forward_wps[-1].twist.twist.linear.x)
         return
 
     def traffic_cb(self, traffic_light_state):
