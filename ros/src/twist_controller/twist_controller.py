@@ -38,7 +38,7 @@ class Controller(object):
             
         yaw_controller = YawController()
         steering = yaw_controller.get_steering(twist_cmd.twist.linear.x, twist_cmd.twist.angular.z, current_velocity.twist.linear.x)
-        rospy.loginfo("twist_controller current velocity, end_velocity, throttle = %s, %s, %s, %s, %s", current_velocity.twist.linear.x, twist_cmd.twist.linear.x,throttle, brake, steering)
+        #rospy.loginfo("twist_controller current velocity, end_velocity, throttle = %s, %s, %s, %s, %s", current_velocity.twist.linear.x, twist_cmd.twist.linear.x,throttle, brake, steering)
         #rospy.loginfo("throttle, brake, steering = %s, %s, %s", throttle, brake, steering)
         return throttle, brake, velocity_cte, steering
         #return 0.0, 0.5, 0, 0

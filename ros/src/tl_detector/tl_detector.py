@@ -173,6 +173,7 @@ class TLDetector(object):
         elif self.state_count >= STATE_COUNT_THRESHOLD:
             self.last_state = self.state
             light_wp = light_wp if state == TrafficLight.RED else -1
+            #rospy.loginfo("inside tl_detector image_cb, light_wp state = %s, %s", light_wp, state)
             self.last_wp = light_wp
             self.upcoming_red_light_pub.publish(Int32(light_wp))
         else:
