@@ -13,7 +13,7 @@ import yaml
 import math
 
 STATE_COUNT_THRESHOLD = 3
-TL_LOOKAHEAD_WPS = 120 # Number of waypoints to look ahead for traffic light.
+TL_LOOKAHEAD_WPS = 55 # Number of waypoints to look ahead for traffic light.
 
 class TLDetector(object):
     def __init__(self):
@@ -59,14 +59,6 @@ class TLDetector(object):
         
         self.upcoming_red_light_pub = rospy.Publisher('/traffic_waypoint', Int32, queue_size=1)
 
-                                
-                                              
-                                              
-
-                                         
-                                              
-                         
-                            
 
         rospy.spin()
 
@@ -184,7 +176,7 @@ class TLDetector(object):
         elif self.state_count >= STATE_COUNT_THRESHOLD:
             self.last_state = self.state
             light_wp = light_wp if state == TrafficLight.RED else -1
-            rospy.loginfo("inside tl_detector image_cb, light_wp state = %s, %s", light_wp, state)
+            #rospy.loginfo("inside tl_detector image_cb, light_wp state = %s, %s", light_wp, state)
             self.last_wp = light_wp
             self.upcoming_red_light_pub.publish(Int32(light_wp))
         else:
@@ -227,13 +219,11 @@ class TLDetector(object):
                 closest_point_not_found = False
             
             car_closest_base_wp_idx = car_closest_base_wp_idx + 1
-            if car_closest_base_wp_idx > len(self.base_wps):
+            if car_closest_base_wp_idx >= len(self.base_wps):
                 #rospy.loginfo("inside loop overflow, car_closest_base_wp_idx = %s", str(car_closest_base_wp_idx))
                 if one_loop_done:
-                    rospy.loginfo("inside loop overflow, one loop done")
                     closest_point_not_found = False
                 else:
-                    rospy.loginfo("inside loop overflow, one loop NOT done")
                     one_loop_done = True
                     car_closest_base_wp_idx = 0
             
@@ -319,7 +309,7 @@ class TLDetector(object):
 
         if light:
             state = self.get_light_state(closest_light_id)
-            rospy.loginfo("nearing light at car_wp, stop_line_wp, state = %s, %s, %s", car_position, closest_stop_line_wp, state)
+            #rospy.loginfo("nearing light at car_wp, stop_line_wp, state = %s, %s, %s", car_position, closest_stop_line_wp, state)
             return closest_stop_line_wp, state
         self.waypoints = None
         return -1, TrafficLight.UNKNOWN
