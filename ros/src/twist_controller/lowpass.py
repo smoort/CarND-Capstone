@@ -1,20 +1,20 @@
 
 class LowPassFilter(object):
-    def __init__(self, tau, ts):
-        self.a = 1. / (tau / ts + 1.)
-        self.b = tau / ts / (tau / ts + 1.);
+    def __init__(self, weight):
+        self.weight = weight
+                                            
 
-        self.last_val = 0.
+        self.last_value = .0
         self.ready = False
 
-    def get(self):
-        return self.last_val
+    def filter(self, value):
+                            
 
-    def filt(self, val):
+                        
         if self.ready:
-            val = self.a * val + self.b * self.last_val
+            value = self.weight * value + (1.-self.weight)* self.last_value
         else:
             self.ready = True
 
-        self.last_val = val
-        return val
+        self.last_value = value
+        return value

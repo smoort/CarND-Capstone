@@ -209,6 +209,7 @@ class WaypointUpdater(object):
             else:
                 dist_to_next_point = self.base_wps[j+1][4]
                 
+            """
             
             if velocity_delta > 0:
                 max_accel = math.sqrt(ACCEL_LIMIT * dist_to_next_point)
@@ -233,14 +234,14 @@ class WaypointUpdater(object):
                 if velocity_delta < -velocity_step:
                     wp.twist.twist.linear.x = self.current_velocity.twist.linear.x - velocity_step
             
-            """        
+                    
                     
             forward_wps.append(wp)
             j = j + 1
             if j >= len(self.base_wps):
                 j = 0
         
-        """        
+                
         velocity_step = 0.5
         if end_velocity == 0:
             #rospy.loginfo("stop light, len of forward_wps = %s", len(forward_wps))
@@ -249,7 +250,7 @@ class WaypointUpdater(object):
                 if forward_wps[len(forward_wps)-1 - i].twist.twist.linear.x > end_velocity_chunk:
                     forward_wps[len(forward_wps)-1 - i].twist.twist.linear.x = end_velocity_chunk
                     end_velocity_chunk = end_velocity_chunk + velocity_step
-                rospy.loginfo("slowdown velocity = %s", forward_wps[len(forward_wps)-1 - i].twist.twist.linear.x)
+                #rospy.loginfo("slowdown velocity = %s", forward_wps[len(forward_wps)-1 - i].twist.twist.linear.x)
         """
         
         if end_velocity == 0:
@@ -262,11 +263,11 @@ class WaypointUpdater(object):
                     target_velocity = target_velocity + (math.sqrt(abs(DECEL_LIMIT) * dist_from_prev_point) * 0.25)
                 #rospy.loginfo("slowdown velocity = %s", forward_wps[len(forward_wps)-1 - i].twist.twist.linear.x)
                 
-        
+        """
         
         self.final_wps = forward_wps
         #rospy.loginfo("no_of_wp, velocity_delta, start_velocity, end_velocity = %s, %s, %s, %s", len(self.final_wps), forward_wps[0].twist.twist.linear.x-self.current_velocity.twist.linear.x, forward_wps[0].twist.twist.linear.x, forward_wps[-1].twist.twist.linear.x)
-        rospy.loginfo("count, start_wp, end_wp = %s, %s, %s", num_of_way_points, start_wp, end_wp)
+        #rospy.loginfo("count, start_wp, end_wp = %s, %s, %s", num_of_way_points, start_wp, end_wp)
         #rospy.loginfo("wp = %s", start_wp)
         return
 
