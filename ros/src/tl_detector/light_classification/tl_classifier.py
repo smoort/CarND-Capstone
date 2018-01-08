@@ -20,11 +20,14 @@ class TLClassifier(object):
         self.simulation = simulation
 
         # Load the right models
+        """
         if self.simulation is True:
             self.checkpoint = working_dir + '/graph_sim/frozen_inference_graph.pb'
         else:
             self.checkpoint = working_dir + '/graph_udacity_real/frozen_inference_graph.pb'
-
+        """
+        self.checkpoint = working_dir + '/traffic_light_bosch_site_rcnn/frozen_inference_graph.pb'
+        
         # Create a label dictionary
         item_green = {'id': 1, 'name': u'traffic_light-green'}
         item_red = {'id': 2, 'name': u'traffic_light-red'}

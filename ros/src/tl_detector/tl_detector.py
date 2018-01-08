@@ -33,12 +33,9 @@ class TLDetector(object):
         config_string = rospy.get_param("/traffic_light_config")
         self.config = yaml.load(config_string)
         
-        self.simulation = rospy.get_param('~simulator_flag', False)         #  Flag that decides which graph will be used
-        rospy.loginfo("simulator_flag = %s", self.simulation)
+        self.simulation = rospy.get_param('~simulator_flag', False)         #  Flag that decides if actual classification is run or stub is used
+        rospy.loginfo("tl classifier simulator_flag = %s", self.simulation)
 
-        self.tl_classifier_used = rospy.get_param('~tl_cl_used_flag', True) #  Flag that decides if tl_classifier will be used for red light identification
-        rospy.loginfo("tl_cl_used_flag = %s", self.tl_classifier_used)
-        
         self.bridge = CvBridge()
         self.light_classifier = TLClassifier(self.simulation)
         self.listener = tf.TransformListener()
@@ -258,7 +255,9 @@ class TLDetector(object):
 
         #Get classification
         
-        if self.tl_classifier_used:
+        if self.simulation:
+            return self.traffic_light_status[light]
+        else:
             rospy.loginfo("requested classification at %s", rospy.get_rostime())
             tl_status = self.light_classifier.get_classification(cv_image)        
             state = 4
@@ -272,8 +271,7 @@ class TLDetector(object):
             rospy.loginfo("classification at wp, classification = %s, %s", self.current_position[0], state)            
             rospy.loginfo("stub, real = %s, %s", self.traffic_light_status[light], state)
             return state
-        else:
-            return self.traffic_light_status[light]
+            
 
     def process_traffic_lights(self, current_position):
         """Finds closest visible traffic light, if one exists, and determines its
